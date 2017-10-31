@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program",
+      "program": "${workspaceRoot}/node_modules/ts-node/dist/_bin.js",
+      "args": ["${relativeFile}"],
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "stopOnEntry": false,
+      "console": "internalConsole",
+      "skipFiles": ["node_modules/**/*.js", "<node_internals>/**/*.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Tests",
+      "program": "${workspaceRoot}/node_modules/.bin/jest",
+      "args": ["-i", "${relativeFile}", "--colors"],
+      "runtimeExecutable": null,
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "stopOnEntry": false,
+      "console": "internalConsole",
+      "skipFiles": ["node_modules/**/*.js", "<node_internals>/**/*.js"]
+    }
+  ]
+}
