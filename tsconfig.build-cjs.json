@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.build-es.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "dist/cjs/"
+  },
+  "files": ["./src/index.ts"]
+}
