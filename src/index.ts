@@ -23,20 +23,20 @@ export default class Loadable extends Component<Props, State> {
     try {
       p = fn();
     } catch (err) {
-      return this.setState({ component: () => error(err) });
+      return this.setState({ component: error(err) });
     }
 
     if (p.then !== undefined) {
       return p
         .then((c: any) => {
           this.setState({
-            component: c.default !== undefined ? c.default : () => c,
+            component: c.default !== undefined ? c.default() : c,
           });
         })
-        .catch((err: Error) => this.setState({ component: () => error(err) }));
+        .catch((err: Error) => this.setState({ component: error(err) }));
     } else {
       return this.setState({
-        component: () => (p.default !== undefined ? p.default : p),
+        component: p.default !== undefined ? p.default() : p,
       });
     }
   }
@@ -50,6 +50,6 @@ export default class Loadable extends Component<Props, State> {
   render() {
     return this.state.component === undefined
       ? this.props.loading()
-      : this.state.component();
+      : this.state.component;
   }
 }
