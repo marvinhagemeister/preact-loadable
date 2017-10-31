@@ -43,7 +43,7 @@ export default class Loadable extends Component<Props, State> {
 
   componentWillReceiveProps(props: Props) {
     this.props = props;
-    // Force render
+    // We need to re-check current state
     this.componentWillMount();
   }
 
