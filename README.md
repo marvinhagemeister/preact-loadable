@@ -22,9 +22,11 @@ import Loadable from "preact-loadable";
 function MyComponent() {
   return <div>
     <Loadable
-      fn={() => import("../MyOtherComponent")} // Can be sync or async
+      // Can be sync or async
+      fn={() => import("../MyOtherComponent").then(m => m.default())}
       error={err => "Oops, an error occurred: " + err.message}
       loading={() => "Loading..."}
+      success={result => doSomething(result)}
     />
   </div>;
 }

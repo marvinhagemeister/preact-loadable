@@ -1,6 +1,6 @@
 {
   "name": "preact-loadable",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Preact component for async tasks",
   "main": "dist/cjs/index.js",
   "module": "dist/es/index.js",
