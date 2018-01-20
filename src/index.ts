@@ -1,55 +1,76 @@
 import { Component } from "preact";
 
-export interface Props {
-  fn: () => any | Promise<any>;
+export interface Props<R = any> {
+  fn: () => R | Promise<R>;
   loading: () => any;
+  success: (result: R) => any;
   error: (err: Error) => any;
+  /** Time in ms */
+  waitUntil: number;
+  /** Time in ms */
+  minLoaderVisible: number;
 }
 
-export interface State {
-  component: any;
+export interface State<R> {
+  result: R;
+  showLoader: boolean;
 }
 
-export default class Loadable extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { component: undefined };
-  }
+export default class Loadable<R = any> extends Component<Props<R>, State<R>> {
+  state = {
+    result: undefined,
+    showLoader: false,
+  } as any;
+  timer: number = 0;
+  durationTimer: number = 0;
 
-  componentWillMount() {
-    const { fn, error } = this.props;
-
-    let p: any;
+  componentDidMount() {
+    const { fn, error, success, waitUntil } = this.props;
+    let result: R | Promise<R>;
     try {
-      p = fn();
+      result = fn();
     } catch (err) {
-      return this.setState({ component: error(err) });
+      return this.update(error(err));
     }
 
-    if (p.then !== undefined) {
-      return p
-        .then((c: any) => {
-          this.setState({
-            component: c.default !== undefined ? c.default() : c,
-          });
-        })
-        .catch((err: Error) => this.setState({ component: error(err) }));
+    if ((result as Promise<R>).then !== undefined) {
+      this.timer = setTimeout(this.showLoader, waitUntil);
+
+      return (result as Promise<R>)
+        .then(c => this.update(success(c)))
+        .catch(err => this.update(error(err)));
     } else {
-      return this.setState({
-        component: p.default !== undefined ? p.default() : p,
-      });
+      this.update(success(result as R));
     }
   }
 
-  componentWillReceiveProps(props: Props) {
-    this.props = props;
-    // We need to re-check current state
-    this.componentWillMount();
+  update(result: R) {
+    this.componentWillUnmount();
+    this.setState({ result, showLoader: false });
+  }
+
+  showLoader = () => {
+    this.setState({ showLoader: true });
+    this.durationTimer = setTimeout(
+      this.loaderDuration,
+      this.props.minLoaderVisible,
+    );
+  };
+
+  loaderDuration = () => this.setState({ showLoader: false });
+
+  componentWillUnmount() {
+    clearTimeout(this.timer);
+    clearTimeout(this.durationTimer);
   }
 
   render() {
-    return this.state.component === undefined
-      ? this.props.loading()
-      : this.state.component;
+    const { result, showLoader } = this.state;
+
+    if (result === undefined && !showLoader) {
+      return null;
+    }
+
+    return result === undefined ? this.props.loading() : result;
   }
 }
